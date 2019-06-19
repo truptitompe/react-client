@@ -1,11 +1,17 @@
-import React from 'react';
-import './App.css';
+import React,{ Fragment } from 'react';
 
-function App() {
+import { WeatherDemo } from './pages';
+import { theme } from './theme';
+import { ThemeProvider } from '@material-ui/styles';
+
+const App = () =>  {
+  console.log("theme in app", theme);
   return (
-    <div>
-      
-    </div>
+    <Fragment>
+      <ThemeProvider theme={theme}>
+      <WeatherDemo />
+      </ThemeProvider>
+    </Fragment>
   );
 }
 
