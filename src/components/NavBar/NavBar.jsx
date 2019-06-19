@@ -63,9 +63,6 @@ const useStyles = theme => ({
 });
 
 class NavBar extends Component {
-  state = {
-    dataSource: '',
-  }
   render(){
   const { classes }  = this.props;
   
