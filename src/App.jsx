@@ -5,7 +5,6 @@ import { theme } from './theme';
 import { ThemeProvider } from '@material-ui/styles';
 
 const App = () =>  {
-  console.log("theme in app", theme);
   return (
     <Fragment>
       <ThemeProvider theme={theme}>
