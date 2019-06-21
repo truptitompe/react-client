@@ -11,12 +11,9 @@ const useStyles = theme => ({
         flexDirection: 'row',
         
     },
-    sidebar: {
-        
-    },
     table: {
         marginLeft: theme.spacing(20),
-        padding: theme.spacing(20),
+        padding: theme.spacing(100),
     }
 
 })
@@ -28,8 +25,8 @@ class WeatherDemo extends Component {
                 <NavBar />
                 <div className={classes.root}>
                 <SideBar  />
+                <div className={classes.table}>
                 <CountryTable 
-                className={classes.table}
                 id="id"
     // data={data}
     columns={[
@@ -79,6 +76,7 @@ class WeatherDemo extends Component {
     // loader={loading}
     // dataLength={data.length}
 />
+</div>
 </div>
         </>
         )
