@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import { NavBar } from '../components';
+import { NavBar } from '../../components';
 
 const PrivateLayout = ({ children, ...rest }) => (
   <React.Fragment>
