@@ -16,6 +16,6 @@ export const callApi = async ({
     data,
     params,
   });
-  console.log('response', response);
+  // console.log('response', response);
   return response;
 };

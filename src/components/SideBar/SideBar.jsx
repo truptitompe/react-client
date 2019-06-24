@@ -27,7 +27,7 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-const SideBar = () =>  {
+const SideBar = () => {
   const classes = useStyles();
 
   return (
@@ -44,18 +44,16 @@ const SideBar = () =>  {
         <div className={classes.toolbar} />
         <Divider />
         <List>
-          {['City', 'Parameter', 'Has Geo'].map((text, index) => (
+          {['City', 'Parameter', 'Has Geo'].map(text => (
             <ListItem button key={text}>
 
               <ListItemText primary={text} />
             </ListItem>
           ))}
-          <ListItem radioButton>
-
-          </ListItem>
+          <ListItem radioButton />
         </List>
       </Paper>
-      </div>
+    </div>
   );
-}
+};
 export default SideBar;
