@@ -5,25 +5,28 @@ import PropTypes from 'prop-types';
 import { NavBar } from '../../components';
 import { CountryTable } from '../../components/Table';
 import { SideBar } from '../../components/SideBar';
-import { LATEST, COUNTRIES, CITIES } from '../../lib/utils/constants';
+import {
+  COUNTRIES, MEASUREMENTS, CITIES, PARAMETERS,
+} from '../../lib/utils/constants';
 import { callApi } from '../../lib/utils/api';
 
-const useStyles = theme => ({
+const useStyles = () => ({
   root: {
     display: 'flex',
     flexDirection: 'row',
 
   },
   table: {
-    marginLeft: theme.spacing(200),
-    padding: theme.spacing(0),
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 
 });
 class WeatherDemo extends Component {
   state = {
     rowsPerPage: 100,
-    count: 0,
+    count: 1,
     sort: 'asc',
     page: 1,
     loading: false,
@@ -34,6 +37,9 @@ class WeatherDemo extends Component {
     name: 'Select...',
     cityData: [],
     latestData: [],
+    countryCode: '',
+    coordinates: {},
+    parameters: [],
   };
 
   handleDialogOpen = async () => {
@@ -61,7 +67,6 @@ class WeatherDemo extends Component {
           page,
         },
       });
-      console.log('response', res);
       this.setState({
         countryData: res.data.results,
         loading: false,
@@ -73,18 +78,55 @@ class WeatherDemo extends Component {
     }
   }
 
-  handleChange = (value, code) => async (event, newPage) => {
-    const cities = CITIES;
-    const {
-      limit, orderBy, sort,
-    } = this.state;
+  onChangePage = (event, newPage) => {
     this.setState({
       page: newPage,
-      orderBy,
-      limit,
+    });
+  }
+
+  handleChange = (value, code) => async () => {
+    const measurements = MEASUREMENTS;
+    const {
+      limit, sort, page, coordinates, parameters,
+    } = this.state;
+    this.setState({
       loading: true,
       name: value,
-      sort,
+      open: false,
+      countryCode: code,
+    });
+    try {
+      const res = await callApi({
+        method: 'get',
+        uri: `${measurements}`,
+        params: {
+          limit,
+          country: code,
+          orderBy: 'country',
+          sort,
+          page,
+          coordinates,
+          parameters,
+        },
+      });
+      this.setState({
+        cityData: res.data.results,
+        loading: false,
+      }, this.handleParameters);
+    } catch (err) {
+      this.setState({
+        loading: false,
+      });
+    }
+  }
+
+  handleCity = async () => {
+    const cities = CITIES;
+    const {
+      limit, sort, page, countryCode,
+    } = this.state;
+    this.setState({
+      loading: true,
       open: false,
     });
     try {
@@ -93,13 +135,46 @@ class WeatherDemo extends Component {
         uri: `${cities}`,
         params: {
           limit,
-          country: code,
+          country: countryCode,
           orderBy: 'country',
           sort,
+          page,
         },
       });
       this.setState({
-        cityData: res.data.results,
+        latestData: res.data.results,
+        loading: false,
+      });
+    } catch (err) {
+      this.setState({
+        loading: false,
+      });
+    }
+  }
+
+  handleParameters = async () => {
+    const parameters = PARAMETERS;
+    const {
+      limit, sort, page, countryCode,
+    } = this.state;
+    this.setState({
+      loading: true,
+      open: false,
+    });
+    try {
+      const res = await callApi({
+        method: 'get',
+        uri: `${parameters}`,
+        params: {
+          limit,
+          country: countryCode,
+          orderBy: ['preferredUnit', 'id'],
+          sort,
+          page,
+        },
+      });
+      this.setState({
+        parameters: res.data.results,
         loading: false,
       });
     } catch (err) {
@@ -119,9 +194,10 @@ class WeatherDemo extends Component {
     const { classes } = this.props;
     const {
       rowsPerPage, open, name,
-      count, sort, orderBy, page, loading, countryData, cityData, latestData,
+      count, sort, orderBy, page,
+      loading, countryData, cityData, latestData, parameters,
     } = this.state;
-    console.log('citydata', cityData);
+    console.log("parameters", latestData, parameters);
     return (
       <>
         <NavBar
@@ -137,7 +213,7 @@ class WeatherDemo extends Component {
           loading={loading}
         />
         <div className={classes.root}>
-          <SideBar />
+          <SideBar latestData={latestData} parameters={parameters} />
           <div className={classes.table}>
             { cityData.length === 0 ? ''
               : (
@@ -150,24 +226,6 @@ class WeatherDemo extends Component {
                       label: 'City',
                       align: 'center',
                     },
-                  ]}
-                  orderBy={orderBy}
-                  count={count}
-                  sort={sort}
-                  rowsPerPage={rowsPerPage}
-                  page={page}
-                  loader={loading}
-                />
-              )
-          }
-          </div>
-          <div className={classes.table}>
-            { latestData.length === 0 ? ''
-              : (
-                <CountryTable
-                  id="id"
-                  latestData={latestData}
-                  columns={[
                     {
                       field: 'location',
                       label: 'Location',
@@ -196,9 +254,8 @@ class WeatherDemo extends Component {
                   sort={sort}
                   rowsPerPage={rowsPerPage}
                   page={page}
-                  showRowData={this.showRowData()}
-              // onChangePage={this.onChangePage}
-                  loader={loading}
+                  loading={loading}
+                  onChangePage={this.onChangePage}
                 />
               )
           }

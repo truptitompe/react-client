@@ -1,15 +1,21 @@
-import React from 'react';
-import { makeStyles } from '@material-ui/core/styles';
+import React, { Component } from 'react';
+import { withStyles } from '@material-ui/core/styles';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import List from '@material-ui/core/List';
 import Divider from '@material-ui/core/Divider';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
 import Paper from '@material-ui/core/Paper';
+import PropTypes from 'prop-types';
 
-const drawerWidth = 240;
+import {
+  Radio, FormControl,
+  RadioGroup, FormControlLabel, FormGroup, Checkbox,
+} from '@material-ui/core';
 
-const useStyles = makeStyles(theme => ({
+const drawerWidth = 'auto';
+
+const useStyles = theme => ({
   root: {
     display: 'flex',
   },
@@ -25,35 +31,90 @@ const useStyles = makeStyles(theme => ({
     backgroundColor: theme.palette.background.default,
     padding: theme.spacing(3),
   },
-}));
+});
 
-const SideBar = () => {
-  const classes = useStyles();
+class SideBar extends Component {
+  state = {
+    selected: '',
+    checked: '',
+  }
 
-  return (
-    <div className={classes.root}>
-      <CssBaseline />
-      <Paper
-        className={classes.drawer}
-        variant="permanent"
-        classes={{
-          paper: classes.drawerPaper,
-        }}
-        anchor="left"
-      >
-        <div className={classes.toolbar} />
-        <Divider />
-        <List>
-          {['City', 'Parameter', 'Has Geo'].map(text => (
-            <ListItem button key={text}>
+  handleChange = (event) => {
+    this.setState({
+      selected: event.target.value,
+      checked: event.target.value,
+    });
+  }
 
-              <ListItemText primary={text} />
+  render() {
+    const {
+      classes, latestData,
+      parameters, checked,
+    } = this.props;
+    const { selected } = this.state;
+    return (
+      <div className={classes.root}>
+        <CssBaseline />
+        <Paper
+          className={classes.drawer}
+          variant="permanent"
+          classes={{
+            paper: classes.drawerPaper,
+          }}
+          anchor="left"
+        >
+          <div className={classes.toolbar} />
+          <Divider />
+          <List>
+            <ListItem radio>
+              <ListItemText primary="Has Geo" />
             </ListItem>
-          ))}
-          <ListItem radioButton />
-        </List>
-      </Paper>
-    </div>
-  );
+            <ListItem>
+              <ListItemText primary="City" />
+            </ListItem>
+            {latestData.map(items => (
+              <ListItem>
+                <FormControl>
+                  <RadioGroup
+                    name="radio"
+                    value={selected}
+                    onChange={this.handleChange}
+                  >
+                    <FormControlLabel value={items.city} control={<Radio />} label={items.city} />
+                  </RadioGroup>
+                </FormControl>
+              </ListItem>
+            ))}
+            <ListItem>
+              <ListItemText primary="Parameters" />
+            </ListItem>
+            { parameters.map(item => (
+              <ListItem>
+                <FormControl>
+                  <FormGroup name="checkbox" value={checked} onChange={this.handleChange}>
+                    <FormControlLabel
+                      value={item.name}
+                      control={<Checkbox color="primary" />}
+                      label={item.name}
+                    />
+                  </FormGroup>
+                </FormControl>
+              </ListItem>
+            ))}
+          </List>
+        </Paper>
+      </div>
+    );
+  }
+}
+SideBar.propTypes = {
+  classes: PropTypes.shape({
+    types: PropTypes.string,
+  }).isRequired,
+  latestData: PropTypes.arrayOf(
+    PropTypes.shape({
+      types: PropTypes.string,
+    }),
+  ).isRequired,
 };
-export default SideBar;
+export default withStyles(useStyles)(SideBar);

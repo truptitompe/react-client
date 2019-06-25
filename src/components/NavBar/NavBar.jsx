@@ -11,8 +11,6 @@ import {
   InputBase, DialogContent, Dialog, DialogActions, DialogContentText, TextField, InputAdornment, Button, CircularProgress,
 } from '@material-ui/core';
 import KeyboardArrowDown from '@material-ui/icons/KeyboardArrowDown';
-// import { callApi } from '../../lib/utils/api';
-// import { COUNTRIES, CITIES } from '../../lib/utils/constants';
 
 const useStyles = theme => ({
   root: {
@@ -59,7 +57,7 @@ class NavBar extends React.Component {
   render() {
     const {
       classes, handleChange,
-      handleDialogOpen, handleClose,
+      handleDialogOpen,
       open, countryData,
       name, loading,
     } = this.props;
@@ -88,9 +86,7 @@ class NavBar extends React.Component {
                 />
               </div>
               <TextField
-
                 className={classes.select}
-                disableUnderline
                 value={name}
                 onClick={handleDialogOpen}
                 InputProps={{
@@ -103,7 +99,6 @@ class NavBar extends React.Component {
               />
               <Dialog
                 open={open}
-                onClose={handleClose}
               >
                 <DialogContent>
                   <DialogActions>
@@ -129,5 +124,17 @@ NavBar.propTypes = {
   classes: PropTypes.shape({
     types: PropTypes.string,
   }).isRequired,
+  handleChange: PropTypes.func.isRequired,
+  handleDialogOpen: PropTypes.func.isRequired,
+  open: PropTypes.bool.isRequired,
+  countryData: PropTypes.arrayOf(
+    PropTypes.shape({
+      types: PropTypes.string,
+    }),
+  ).isRequired,
+  name: PropTypes.string.isRequired,
+  loading: PropTypes.bool.isRequired,
+
+
 };
 export default withStyles(useStyles)(NavBar);
