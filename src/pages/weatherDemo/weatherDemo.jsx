@@ -40,6 +40,9 @@ class WeatherDemo extends Component {
     countryCode: '',
     coordinates: {},
     parameters: [],
+    selected: '',
+    checked: '',
+    latestCity: [],
   };
 
   handleDialogOpen = async () => {
@@ -70,6 +73,7 @@ class WeatherDemo extends Component {
       this.setState({
         countryData: res.data.results,
         loading: false,
+        selected: '',
       });
     } catch (err) {
       this.setState({
@@ -102,7 +106,7 @@ class WeatherDemo extends Component {
         params: {
           limit,
           country: code,
-          orderBy: 'country',
+          orderBy: ['date', 'value', 'parameter'],
           sort,
           page,
           coordinates,
@@ -112,7 +116,8 @@ class WeatherDemo extends Component {
       this.setState({
         cityData: res.data.results,
         loading: false,
-      }, this.handleParameters);
+        selected: '',
+      }, this.handleCity);
     } catch (err) {
       this.setState({
         loading: false,
@@ -129,6 +134,7 @@ class WeatherDemo extends Component {
       loading: true,
       open: false,
     });
+    this.handleParameters();
     try {
       const res = await callApi({
         method: 'get',
@@ -144,6 +150,7 @@ class WeatherDemo extends Component {
       this.setState({
         latestData: res.data.results,
         loading: false,
+        selected: '',
       });
     } catch (err) {
       this.setState({
@@ -176,6 +183,7 @@ class WeatherDemo extends Component {
       this.setState({
         parameters: res.data.results,
         loading: false,
+        selected: '',
       });
     } catch (err) {
       this.setState({
@@ -183,6 +191,50 @@ class WeatherDemo extends Component {
       });
     }
   }
+
+  handleChangeRadio = async (event) => {
+    this.setState({
+      selected: event.target.value,
+    }, this.handleRadio);
+  }
+
+  handleRadio = async () => {
+    const measurements = MEASUREMENTS;
+    const {
+      limit, sort, page, coordinates, parameters, countryCode, selected,
+    } = this.state;
+    try {
+      const res = await callApi({
+        method: 'get',
+        uri: `${measurements}`,
+        params: {
+          limit,
+          country: countryCode,
+          orderBy: 'country',
+          sort,
+          city: selected,
+          page,
+          coordinates,
+          parameters,
+        },
+      });
+      this.setState({
+        latestCity: res.data.results,
+        loading: false,
+      });
+    } catch (err) {
+      this.setState({
+        loading: false,
+      });
+    }
+  }
+
+  handleChangeCheckbox = name => (event) => {
+    this.setState({
+      [name]: event.target.checked,
+    });
+  }
+
 
   handleClose = () => {
     this.setState({
@@ -195,9 +247,8 @@ class WeatherDemo extends Component {
     const {
       rowsPerPage, open, name,
       count, sort, orderBy, page,
-      loading, countryData, cityData, latestData, parameters,
+      loading, countryData, cityData, latestData, parameters, selected, checked, latestCity,
     } = this.state;
-    console.log("parameters", latestData, parameters);
     return (
       <>
         <NavBar
@@ -213,7 +264,14 @@ class WeatherDemo extends Component {
           loading={loading}
         />
         <div className={classes.root}>
-          <SideBar latestData={latestData} parameters={parameters} />
+          <SideBar
+            latestData={latestData}
+            parameters={parameters}
+            selected={selected}
+            checked={checked}
+            handleChangeRadio={this.handleChangeRadio}
+            handleChangeCheckbox={this.handleChangeCheckbox}
+          />
           <div className={classes.table}>
             { cityData.length === 0 ? ''
               : (
@@ -251,9 +309,11 @@ class WeatherDemo extends Component {
                   ]}
                   orderBy={orderBy}
                   count={count}
+                  selected={selected}
                   sort={sort}
                   rowsPerPage={rowsPerPage}
                   page={page}
+                  latestCity={latestCity}
                   loading={loading}
                   onChangePage={this.onChangePage}
                 />

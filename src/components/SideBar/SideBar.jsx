@@ -34,24 +34,11 @@ const useStyles = theme => ({
 });
 
 class SideBar extends Component {
-  state = {
-    selected: '',
-    checked: '',
-  }
-
-  handleChange = (event) => {
-    this.setState({
-      selected: event.target.value,
-      checked: event.target.value,
-    });
-  }
-
   render() {
     const {
       classes, latestData,
-      parameters, checked,
+      parameters, selected, checked, handleChangeRadio, handleChangeCheckbox,
     } = this.props;
-    const { selected } = this.state;
     return (
       <div className={classes.root}>
         <CssBaseline />
@@ -72,13 +59,13 @@ class SideBar extends Component {
             <ListItem>
               <ListItemText primary="City" />
             </ListItem>
-            {latestData.map(items => (
+            { latestData.map(items => (
               <ListItem>
                 <FormControl>
                   <RadioGroup
                     name="radio"
                     value={selected}
-                    onChange={this.handleChange}
+                    onChange={handleChangeRadio}
                   >
                     <FormControlLabel value={items.city} control={<Radio />} label={items.city} />
                   </RadioGroup>
@@ -91,9 +78,9 @@ class SideBar extends Component {
             { parameters.map(item => (
               <ListItem>
                 <FormControl>
-                  <FormGroup name="checkbox" value={checked} onChange={this.handleChange}>
+                  <FormGroup name="checkbox" value={checked} onChange={handleChangeCheckbox(item.name)}>
                     <FormControlLabel
-                      value={item.name}
+                      value={checked}
                       control={<Checkbox color="primary" />}
                       label={item.name}
                     />
@@ -116,5 +103,14 @@ SideBar.propTypes = {
       types: PropTypes.string,
     }),
   ).isRequired,
+  handleChangeRadio: PropTypes.func.isRequired,
+  handleChangeCheckbox: PropTypes.func.isRequired,
+  parameters: PropTypes.arrayOf(
+    PropTypes.shape({
+      types: PropTypes.string,
+    }),
+  ).isRequired,
+  selected: PropTypes.string.isRequired,
+  checked: PropTypes.string.isRequired,
 };
 export default withStyles(useStyles)(SideBar);

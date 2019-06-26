@@ -39,9 +39,12 @@ render() {
     data, page,
     count,
     rowsPerPage,
-    loading, onChangePage,
+    loading, onChangePage, latestCity, selected,
   } = this.props;
   const rowData = Array.from(data);
+  const individualData = Array.from(latestCity);
+  let toggle = [];
+  toggle = ((selected === '') ? rowData : individualData);
   return (
     <Paper>
       <Table>
@@ -49,7 +52,7 @@ render() {
           <TableRow>{this.handlerColumn()}</TableRow>
         </TableHead>
         {
-          rowData.map((row, index) => (
+          toggle.map((row, index) => (
             <TableBody>
               <TableRow hover style={{ cursor: 'pointer' }} selected={index % 2 === 0}>
                 {columns.map(items => (
@@ -100,6 +103,12 @@ CountryTable.propTypes = {
   onChangePage: PropTypes.func.isRequired,
   orderBy: PropTypes.string.isRequired,
   sort: PropTypes.string.isRequired,
+  selected: PropTypes.string.isRequired,
+  latestCity: PropTypes.arrayOf(
+    PropTypes.shape({
+      types: PropTypes.string,
+    }),
+  ).isRequired,
   // onSort: PropTypes.func.isRequired,
 };
 export default CountryTable;
