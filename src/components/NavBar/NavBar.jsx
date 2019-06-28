@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 /* eslint-disable max-len */
 import React from 'react';
 import { withStyles, fade } from '@material-ui/core/styles';
@@ -40,7 +41,7 @@ const useStyles = theme => ({
     '&:hover': {
       backgroundColor: fade(theme.palette.common.white, 0.25),
     },
-    width: '50%',
+    width: '60%',
     marginLeft: theme.spacing(30),
     paddingBottom: theme.spacing(10),
   },
@@ -74,20 +75,23 @@ class NavBar extends React.Component {
   render() {
     const {
       classes,
-      handleChange,
+      handleChangeCity,
       handleDialogOpen,
       open,
       countryData,
       name,
-      handleUpdateSearch,
-      filteredData,
-      search,
+      handleCountrySearch,
+      handleLocationSearch,
+      location,
+      filter,
+      searchCountry,
       loading,
     } = this.props;
     const countryList = Array.from(countryData);
-    // const filteredArray = Array.from(filteredData);
+    const filteredArray = Array.from(filter);
     localStorage.setItem('country', name);
-    // const toggleSearchCountry = (search === '' ? countryList : filteredArray);
+    const toggleSearchCountry = (searchCountry === '' ? countryList : filteredArray);
+    console.log("searchCountry", toggleSearchCountry);
     return (
       <React.Fragment>
         <CssBaseline />
@@ -107,6 +111,8 @@ class NavBar extends React.Component {
                     root: classes.inputRoot,
                     input: classes.inputInput,
                   }}
+                  onChange={handleLocationSearch}
+                  value={location}
                   inputProps={{ 'aria-label': 'Search' }}
                 />
               </div>
@@ -132,24 +138,26 @@ class NavBar extends React.Component {
                           <SearchIcon />
                         </div>
                         <InputBase
-                          placeholder="Search Country"
+                          placeholder="Enter Country Code "
                           classes={{
                             root: classes.inputRoot,
                             input: classes.inputInput,
                           }}
-                          onChange={handleUpdateSearch}
-                          value={search}
+                          onChange={handleCountrySearch}
+                          value={searchCountry}
                           inputProps={{ 'aria-label': 'Search' }}
                         />
                       </div>
-                      {countryList.map(items => (
+                      {toggleSearchCountry.map(items => (
                         <Button
                           variant="outlined"
                           key={items.code}
-                          value={items.name}
+                          value={items.code || items.name}
                           className={classes.button}
-                          onClick={handleChange(items.name, items.code)}
+                          onClick={handleChangeCity(items.name, items.code)}
                         >
+                          {items.code}
+                          <br />
                           {items.name}
                         </Button>
                       ))}
@@ -168,7 +176,7 @@ NavBar.propTypes = {
   classes: PropTypes.shape({
     types: PropTypes.string,
   }).isRequired,
-  handleChange: PropTypes.func.isRequired,
+  handleChangeCity: PropTypes.func.isRequired,
   handleDialogOpen: PropTypes.func.isRequired,
   open: PropTypes.bool.isRequired,
   countryData: PropTypes.arrayOf(

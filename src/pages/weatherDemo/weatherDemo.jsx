@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 /* eslint-disable no-mixed-spaces-and-tabs */
 /* eslint-disable no-tabs */
 import React, { Component } from 'react';
@@ -13,6 +14,7 @@ import {
   CITIES,
   PARAMETERS,
   LATEST,
+  LOCATIONS,
 } from '../../lib/utils/constants';
 import { callApi } from '../../lib/utils/api';
 
@@ -49,9 +51,11 @@ class WeatherDemo extends Component {
     checkedData: [],
     parametersData: [],
     latestCity: [],
+    filteredData: [],
+    locationData: [],
     location: '',
     geo: [],
-    search: [],
+    searchCountry: '',
   };
 
   handleDialogOpen = async () => {
@@ -96,7 +100,8 @@ class WeatherDemo extends Component {
     });
   };
 
-  handleChange = (value, code) => async () => {
+  // handle for chnage city in table
+  handleChangeCity = (value, code) => async () => {
     const measurements = MEASUREMENTS;
     const {
       limit, sort, page, coordinates, parameters,
@@ -136,6 +141,7 @@ class WeatherDemo extends Component {
     }
   };
 
+  // handle for filter city
   handleCity = async () => {
     const cities = CITIES;
     const {
@@ -170,6 +176,7 @@ class WeatherDemo extends Component {
     }
   };
 
+  // handle for parameters filter
   handleParameters = async () => {
     const {
       limit, sort, page, countryCode,
@@ -202,6 +209,7 @@ class WeatherDemo extends Component {
     }
   };
 
+  // handle for radio
   handleChangeRadio = async (event) => {
     this.setState(
       {
@@ -248,6 +256,7 @@ class WeatherDemo extends Component {
     }
   };
 
+  // handle for checkbox
   handleChangeCheckbox = value => () => {
     let { checkedData } = this.state;
     if (checkedData.filter(data => value === data).length) {
@@ -267,6 +276,7 @@ class WeatherDemo extends Component {
       sort,
       page,
       checkedData,
+      selected,
       countryCode,
     } = this.state;
     try {
@@ -278,10 +288,10 @@ class WeatherDemo extends Component {
           country: countryCode,
           sort,
           page,
-          parameters: checkedData,
+          city: selected,
+          parameter: checkedData,
         },
       });
-      console.log('response', res);
       this.setState({
         parametersData: res.data.results,
         loading: false,
@@ -293,7 +303,7 @@ class WeatherDemo extends Component {
     }
   }
 
-
+  // handle for geo location
   handleGeo = async () => {
     const latest = LATEST;
     const {
@@ -327,19 +337,95 @@ class WeatherDemo extends Component {
     }
   };
 
-  handleUpdateSearch = (event) => {
-    // this.setState({
-    //   search: event.target.value.substr(0, 20),
-    // }, this.handleSearch);
+  // handle for search country
+  handleCountrySearch = (event) => {
+    this.setState({
+      searchCountry: event.target.value.substring(0, 20),
+    }, this.handleSearch);
   }
 
-  // handleSearch = () => {
-  //   const { search, countryData } = this.search;
-  //   console.log("countryData", countryData);
-  //   const filteredData = countryData.filter(filterData => filterData.name.indexOf(search) !== -1);
-  //   console.log("filteredData", filteredData);
-  //   return filteredData;
-  // };
+  handleSearch = () => {
+    const { searchCountry, countryData, filteredData } = this.state;
+    const data = countryData.filter(filterData => ((filteredData.name || filterData.code).toUpperCase().indexOf(searchCountry) !== -1));
+    if (data.length >= 1) {
+      this.setState({
+        filteredData: data,
+      });
+    }
+  };
+
+  handleLocationSearch = (event) => {
+    this.setState({
+      location: event.target.value.substring(0, 20),
+    }, this.handleLocation);
+  }
+
+  handleLocation = async () => {
+    const locations = LOCATIONS;
+    const {
+      limit, sort, page, countryCode, selected,
+    } = this.state;
+    this.setState({
+      loading: true,
+      open: false,
+    });
+    try {
+      const res = await callApi({
+        method: 'get',
+        uri: `${locations}`,
+        params: {
+          limit,
+          country: [countryCode],
+          orderBy: ['count', 'country'],
+          sort,
+          city: [selected],
+          page,
+        },
+      });
+      this.setState({
+        locationData: res.data.results,
+        loading: false,
+        selected: '',
+      });
+    } catch (err) {
+      this.setState({
+        loading: false,
+      });
+    }
+  }
+
+  // handleLocation = async () => {
+  //   const measurements = MEASUREMENTS;
+  //   const {
+  //     limit,
+  //     sort,
+  //     page,
+  //     location,
+  //     checkedData,
+  //     selected,
+  //     countryCode,
+  //   } = this.state;
+  //   try {
+  //     const res = await callApi({
+  //       method: 'get',
+  //       uri: `${measurements}`,
+  //       params: {
+  //         limit,
+  //         sort,
+  //         page,
+  //         location,
+  //       },
+  //     });
+  //     this.setState({
+  //       locationData: res.data.results,
+  //       loading: false,
+  //     });
+  //   } catch (err) {
+  //     this.setState({
+  //       loading: false,
+  //     });
+  //   }
+  // }
 
   render() {
     const { classes } = this.props;
@@ -357,27 +443,28 @@ class WeatherDemo extends Component {
       latestData,
       parameters,
       parametersData,
+      locationData,
       selected,
+      location,
       filteredData,
       latestCity,
-      search,
+      searchCountry,
     } = this.state;
-    console.log('checked', parametersData);
-    // console.log('checked', filteredData);
-
     return (
       <>
         <NavBar
           open={open}
           handleDialogOpen={this.handleDialogOpen}
-          handleChange={this.handleChange}
+          handleChangeCity={this.handleChangeCity}
           onClose={this.handleClose}
           countryData={countryData}
           name={name}
-          search={search}
-          handleUpdateSearch={this.handleUpdateSearch}
+          searchCountry={searchCountry}
+          location={location}
+          handleCountrySearch={this.handleCountrySearch}
+          handleLocationSearch={this.handleLocationSearch}
           orderBy={orderBy}
-          filteredData={filteredData}
+          filter={filteredData}
           sort={sort}
           page={page}
           loading={loading}
@@ -387,7 +474,6 @@ class WeatherDemo extends Component {
             latestData={latestData}
             parameters={parameters}
             selected={selected}
-            // checked={checkedData}
             handleChangeRadio={this.handleChangeRadio}
             handleChangeCheckbox={this.handleChangeCheckbox}
           />
@@ -434,7 +520,9 @@ class WeatherDemo extends Component {
                 rowsPerPage={rowsPerPage}
                 page={page}
                 latestCity={latestCity}
+                locationData={locationData}
                 loading={loading}
+                parametersData={parametersData}
                 onChangePage={this.onChangePage}
               />
             )}

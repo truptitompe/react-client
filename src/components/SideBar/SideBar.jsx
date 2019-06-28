@@ -97,7 +97,7 @@ class SideBar extends Component {
                 <FormControl>
                   <FormGroup>
                     <FormControlLabel
-                      value={key.name}
+                      value={key.id}
                       onChange={handleChangeCheckbox(key.id)}
                       control={<Checkbox color="primary" />}
                       label={key.name}

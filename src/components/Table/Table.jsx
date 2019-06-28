@@ -39,12 +39,14 @@ render() {
     data, page,
     count,
     rowsPerPage,
-    loading, onChangePage, latestCity, selected,
+    loading, onChangePage, latestCity, selected, parametersData, locationData,
   } = this.props;
   const rowData = Array.from(data);
-  const individualData = Array.from(latestCity);
+  const cityArray = Array.from(latestCity);
+  const parametersArray = Array.from(parametersData);
+  const locationArray = Array.from(locationData);
   let toggle = [];
-  toggle = ((selected === '') ? rowData : individualData);
+  toggle = ((selected === '') ? rowData || locationArray : cityArray || parametersArray);
   return (
     <Paper>
       <Table>
