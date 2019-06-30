@@ -112,7 +112,7 @@ class WeatherDemo extends Component {
 		});
 	};
 
-	// handle for chnage city in table
+	// handle for change city in table
 	handleChangeCity = (value, code) => async () => {
 		const measurements = MEASUREMENTS;
 		const { limit, sort, page, coordinates, parameters } = this.state;
