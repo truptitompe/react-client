@@ -1,0 +1,46 @@
+{
+  "name": "training",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "@material-ui/core": "^4.1.1",
+    "@material-ui/icons": "^4.2.0",
+    "@material-ui/styles": "^4.1.1",
+    "axios": "^0.19.0",
+    "eslint-config-airbnb": "^17.1.0",
+    "react": "^16.8.6",
+    "react-dom": "^16.8.6",
+    "react-router-dom": "^5.0.1",
+    "react-scripts": "3.0.1"
+  },
+  "scripts": {
+    "start": "BROWSER=none react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "test:c": "react-scripts test --coverage",
+    "eject": "react-scripts eject",
+    "lint": "eslint src/**/*.js src/**/*.jsx",
+    "lint:fix": "eslint --fix src",
+    "commit": "npx git-cz"
+  },
+  "eslintConfig": {
+    "extends": "react-app"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "npm run lint"
+    }
+  }
+}
